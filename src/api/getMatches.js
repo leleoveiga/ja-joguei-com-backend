@@ -54,4 +54,41 @@ router.get("/:nick1/:nick2", async (req, res, next) => {
   }
 });
 
+async function playedWith(id1, id2, matches) {
+  let urlMatch =
+    "https://br1.api.riotgames.com/lol/match/v4/matches/?matchId?api_key=?apiKey";
+
+  const foundMatches = [];
+
+  for (let i = 0; i < matches.length; i++) {
+    console.log(
+      `-------------------partida da posição: ${i}----------------------------`
+    );
+    urlMatch =
+      "https://br1.api.riotgames.com/lol/match/v4/matches/?matchId?api_key=?apiKey";
+    urlMatch = urlMatch.replace(
+      "?apiKey",
+      "RGAPI-f3661b37-17b4-4ec4-aee6-bcf1d5bd3e74"
+    );
+    urlMatch = urlMatch.replace("?matchId", matches[i]);
+
+    // ?matchId - ok
+    // data.participantIdentities
+    // for nisso
+    // data.participantIdentities.player.accountId === id2 -> add na lista de partidas
+
+    const { data } = await axios.get(urlMatch);
+
+    const players = data.participantIdentities;
+    for (let j = 0; j < players.length; j++) {
+      console.log(players[j].player.accountId);
+      if (players[j].player.accountId === id2) {
+        foundMatches.push(matches[i]);
+      }
+    }
+  }
+
+  return foundMatches;
+}
+
 module.exports = router;
