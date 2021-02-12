@@ -5,22 +5,14 @@ const router = express.Router();
 
 router.get("/:nick1/:nick2", async (req, res, next) => {
   try {
-    // eu
-    // 9rN5eV5oxKr5F1CnGgo0dzslcO6lomKMi9PM1KGqlKsfBpU
-    // coringa
-    // qoJ6azc92U-jbAjVsInJk0HTwDJWYe7V71mXsOOq25a1K1I
-
-    const aa = [req.params.nick1, req.params.nick2];
     const ids = await getPlayersId(req.params.nick1, req.params.nick2);
 
     // link api
     let urlTarget =
-      "https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/?id1?api_key=?apiKey&endIndex=10";
+      "https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/?id1?api_key=?apiKey&endIndex=50";
     // coloca a api key no link
-    urlTarget = urlTarget.replace(
-      "?apiKey",
-      "RGAPI-f3661b37-17b4-4ec4-aee6-bcf1d5bd3e74"
-    );
+    urlTarget = urlTarget.replace("?apiKey", process.env.API_KEY);
+
     // coloca o id do player no link
     urlTarget = urlTarget.replace("?id1", ids[0]);
 
@@ -62,20 +54,12 @@ async function playedWith(id1, id2, matches) {
 
   for (let i = 0; i < matches.length; i++) {
     console.log(
-      `-------------------partida da posição: ${i}----------------------------`
+      `-------------------match: ${i + 1}----------------------------`
     );
     urlMatch =
       "https://br1.api.riotgames.com/lol/match/v4/matches/?matchId?api_key=?apiKey";
-    urlMatch = urlMatch.replace(
-      "?apiKey",
-      "RGAPI-f3661b37-17b4-4ec4-aee6-bcf1d5bd3e74"
-    );
+    urlMatch = urlMatch.replace("?apiKey", process.env.API_KEY);
     urlMatch = urlMatch.replace("?matchId", matches[i]);
-
-    // ?matchId - ok
-    // data.participantIdentities
-    // for nisso
-    // data.participantIdentities.player.accountId === id2 -> add na lista de partidas
 
     const { data } = await axios.get(urlMatch);
 
@@ -102,14 +86,12 @@ async function getPlayersId(nick1, nick2) {
     urlTarget =
       "https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/?nick?api_key=?apiKey";
     urlTarget = urlTarget.replace("?nick", nicks[i]);
-    urlTarget = urlTarget.replace(
-      "?apiKey",
-      "RGAPI-f3661b37-17b4-4ec4-aee6-bcf1d5bd3e74"
-    );
-    console.log(urlTarget);
+    urlTarget = urlTarget.replace("?apiKey", process.env.API_KEY);
     const { data } = await axios.get(urlTarget);
     ids.push(data.accountId);
+    console.log("--------------------selected ids--------------------");
     console.log(ids);
+    console.log("----------------------------------------------------");
   }
 
   return ids;

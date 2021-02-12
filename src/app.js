@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+require("dotenv/config");
 // const morgan = require("morgan");
 // const helmet = require("helmet");
 
@@ -17,9 +18,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-	res.json({
-		message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄",
-	});
+  res.json({
+    message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄",
+  });
 });
 
 app.use("/api/", api);
