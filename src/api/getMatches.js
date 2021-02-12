@@ -91,4 +91,28 @@ async function playedWith(id1, id2, matches) {
   return foundMatches;
 }
 
+async function getPlayersId(nick1, nick2) {
+  const nicks = [nick1, nick2];
+  const ids = [];
+
+  let urlTarget =
+    "https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/?nick?api_key=?apiKey";
+
+  for (let i = 0; i < 2; i++) {
+    urlTarget =
+      "https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/?nick?api_key=?apiKey";
+    urlTarget = urlTarget.replace("?nick", nicks[i]);
+    urlTarget = urlTarget.replace(
+      "?apiKey",
+      "RGAPI-f3661b37-17b4-4ec4-aee6-bcf1d5bd3e74"
+    );
+    console.log(urlTarget);
+    const { data } = await axios.get(urlTarget);
+    ids.push(data.accountId);
+    console.log(ids);
+  }
+
+  return ids;
+}
+
 module.exports = router;
