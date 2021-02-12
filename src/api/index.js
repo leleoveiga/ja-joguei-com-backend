@@ -1,14 +1,14 @@
 const express = require("express");
-const getSummonerByNick = require("./getSummonerByNick");
+const getMatches = require("./getMatches");
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
-	res.json({
-		message: "API - 👋🌎🌍🌏",
-	});
+  res.json({
+    message: "API - 👋🌎🌍🌏",
+  });
 });
 
-router.use("/get", getSummonerByNick);
+router.use("/getMatches", getMatches);
 
 module.exports = router;
