@@ -32,10 +32,10 @@ router.get("/:nick1/:nick2", async (req, res, next) => {
     foundMatches.forEach(function (gameIdFound, index, array) {
       data.matches.forEach(function (match, index, arrayAll) {
         if (match.gameId === gameIdFound) {
-          // matchesObject.push(match);
-          matchesObject.push(
-            `https://matchhistory.br.leagueoflegends.com/pt/#match-details/BR1/${gameIdFound}?tab=overview`
-          );
+          matchesObject.push(match);
+          // matchesObject.push(
+          //   `https://matchhistory.br.leagueoflegends.com/pt/#match-details/BR1/${gameIdFound}?tab=overview`
+          // );
         }
       });
     });
