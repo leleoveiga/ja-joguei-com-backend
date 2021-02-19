@@ -46,6 +46,10 @@ router.get("/:nick1/:nick2", async (req, res, next) => {
   }
 });
 
+async function getChampionNameByKey(championKey) {
+  const champions = require("../assets/champions.json");
+  return champions[championKey];
+}
 async function playedWith(id1, id2, matches) {
   let urlMatch =
     "https://br1.api.riotgames.com/lol/match/v4/matches/?matchId?api_key=?apiKey";
