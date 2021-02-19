@@ -10,16 +10,14 @@ router.get("/:nick1/:nick2", async (req, res, next) => {
     // link api
     let urlTarget =
       "https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/?id1?api_key=?apiKey&endIndex=50";
-    // coloca a api key no link
     urlTarget = urlTarget.replace("?apiKey", process.env.API_KEY);
 
-    // coloca o id do player no link
     urlTarget = urlTarget.replace("?id1", ids[0]);
+    // coloca a api key e id do player no link
 
     // pega a lista de partidas do player
     const { data } = await axios.get(urlTarget);
 
-    // pega somente o id das partidas
     const matches = [];
     for (let i = 0; i < data.matches.length; i++) {
       matches.push(data.matches[i].gameId);
@@ -71,12 +69,15 @@ async function playedWith(id1, id2, matches) {
     urlMatch = urlMatch.replace("?apiKey", process.env.API_KEY);
     urlMatch = urlMatch.replace("?matchId", matches[i]);
 
+    // get partida pelo id
     const { data } = await axios.get(urlMatch);
 
     const players = data.participantIdentities;
     for (let j = 0; j < players.length; j++) {
       console.log(players[j].player.accountId);
       if (players[j].player.accountId === id2) {
+    // pega a lista dos jogadores da partida
+    // add as partidas em q id2 aparece
         foundMatches.push(matches[i]);
       }
     }
