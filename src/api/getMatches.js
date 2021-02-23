@@ -101,11 +101,11 @@ async function getPlayersId(nick1, nick2) {
     urlTarget = urlTarget.replace("?apiKey", process.env.API_KEY);
     const { data } = await axios.get(urlTarget);
     ids.push(data.accountId);
-    console.log("--------------------selected ids--------------------");
-    console.log(ids);
-    console.log("----------------------------------------------------");
   }
 
+  console.log("--------------------selected ids--------------------");
+  console.log(ids);
+  console.log("----------------------------------------------------");
   return ids;
 }
 
