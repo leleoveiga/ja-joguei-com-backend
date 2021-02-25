@@ -10,7 +10,7 @@ router.get("/:nick1/:nick2/:min/:max", async (req, res, next) => {
     const max = req.params.max;
 
     // link api
-    let urlTarget = `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${ids[0]}?api_key=${process.env.API_KEY}&,beginIndex=${min},endIndex=${max}`;
+    let urlTarget = `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${ids[0]}?api_key=${process.env.API_KEY}&beginIndex=${min}&endIndex=${max}`;
 
     // pega a lista de partidas do player
     const { data } = await axios.get(urlTarget);
