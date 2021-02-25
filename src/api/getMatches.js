@@ -3,17 +3,14 @@ const axios = require("axios");
 
 const router = express.Router();
 
-router.get("/:nick1/:nick2", async (req, res, next) => {
+router.get("/:nick1/:nick2/:min/:max", async (req, res, next) => {
   try {
     const ids = await getPlayersId(req.params.nick1, req.params.nick2);
+    const min = req.params.min;
+    const max = req.params.max;
 
     // link api
-    let urlTarget =
-      "https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/?id0?api_key=?apiKey&endIndex=50";
-
-    // coloca a api key e id do player no link
-    urlTarget = urlTarget.replace("?apiKey", process.env.API_KEY);
-    urlTarget = urlTarget.replace("?id0", ids[0]);
+    let urlTarget = `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${ids[0]}?api_key=${process.env.API_KEY}&,beginIndex=${min},endIndex=${max}`;
 
     // pega a lista de partidas do player
     const { data } = await axios.get(urlTarget);
@@ -38,19 +35,14 @@ function getChampionIconLinkByName(name) {
 }
 
 async function playedWith(id1, id2, matches) {
-  let urlMatch =
-    "https://br1.api.riotgames.com/lol/match/v4/matches/?matchId?api_key=?apiKey";
-
+  let urlMatch = "";
   const foundMatches = [];
 
   for (let i = 0; i < matches.length; i++) {
     console.log(
       `---------------------match: ${i + 1}--------------------------`
     );
-    urlMatch =
-      "https://br1.api.riotgames.com/lol/match/v4/matches/?matchId?api_key=?apiKey";
-    urlMatch = urlMatch.replace("?apiKey", process.env.API_KEY);
-    urlMatch = urlMatch.replace("?matchId", matches[i].gameId);
+    urlMatch = `https://br1.api.riotgames.com/lol/match/v4/matches/${matches[i].gameId}?api_key=${process.env.API_KEY}`;
 
     // get partida pelo id
     const { data } = await axios.get(urlMatch);
@@ -91,14 +83,10 @@ async function getPlayersId(nick1, nick2) {
   const nicks = [nick1, nick2];
   const ids = [];
 
-  let urlTarget =
-    "https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/?nick?api_key=?apiKey";
+  let urlTarget = "";
 
   for (let i = 0; i < 2; i++) {
-    urlTarget =
-      "https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/?nick?api_key=?apiKey";
-    urlTarget = urlTarget.replace("?nick", nicks[i]);
-    urlTarget = urlTarget.replace("?apiKey", process.env.API_KEY);
+    urlTarget = `https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${nicks[i]}?api_key=${process.env.API_KEY}`;
     const { data } = await axios.get(urlTarget);
     ids.push(data.accountId);
   }
