@@ -52,7 +52,13 @@ async function playedWith(id1, id2, matches) {
 
     // add as partidas em q id2 aparece
     for (let j = 0; j < participantIdentities.length; j++) {
+      // add nick 1 to match json
+      if (participantIdentities[j].player.accountId === id1) {
+        matches[i].nick1 = participantIdentities[j].player.summonerName;
+      }
+
       if (participantIdentities[j].player.accountId === id2) {
+        matches[i].nick2 = participantIdentities[j].player.summonerName; // add nick 2 to match json
         console.log(
           "////////////////////////match found!////////////////////////"
         );
