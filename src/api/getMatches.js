@@ -10,7 +10,7 @@ router.get("/:nick1/:nick2/:min/:max", async (req, res, next) => {
     const max = req.params.max;
 
     // link api
-    let urlTarget = `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${ids[0]}?api_key=${process.env.API_KEY}&beginIndex=${min}&endIndex=${max}`;
+    const urlTarget = `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${ids[0]}?api_key=${process.env.API_KEY}&beginIndex=${min}&endIndex=${max}`;
 
     // pega a lista de partidas do player
     const { data } = await axios.get(urlTarget);
@@ -73,12 +73,12 @@ async function playedWith(id1, id2, matches) {
         matches[i].icon2 = championIcon2;
         matches[
           i
-        ].link = `https://matchhistory.br.leagueoflegends.com/pt/#match-details/BR1/${matches[i].gameId}?tab=overview`;
+        ].link = `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}`;
         foundMatches.push(matches[i]);
       }
     }
     console.log(
-      `https://matchhistory.br.leagueoflegends.com/pt/#match-details/BR1/${matches[i].gameId}?tab=overview`
+      `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}`
     );
   }
 
