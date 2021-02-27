@@ -69,6 +69,8 @@ async function playedWith(id1, id2, matches) {
         const championName2 = await getChampionNameByKey(championKey2);
         const championIcon2 = getChampionIconLinkByName(championName2);
 
+        matches[i].description = await convertQueueToString(matches[i].queue);
+        matches[i].date = convertTimestampToDate(matches[i].timestamp);
         matches[i].icon1 = championIcon1;
         matches[i].icon2 = championIcon2;
         matches[
@@ -101,6 +103,24 @@ async function getPlayersId(nick1, nick2) {
   console.log(ids);
   console.log("----------------------------------------------------");
   return ids;
+}
+
+function convertTimestampToDate(timestamp) {
+  const a = new Date(timestamp);
+  const year = a.getFullYear();
+  const month = a.getMonth() + 1;
+  const date = a.getDate();
+  const time = date + "/" + month + "/" + year;
+  return time;
+}
+
+async function convertQueueToString(queue) {
+  const queueList = require("../assets/queues.json");
+  for (let i = 0; i < queueList.length; i++) {
+    if (queueList[i].queueId === queue) {
+      return queueList[i].description;
+    }
+  }
 }
 
 module.exports = router;
