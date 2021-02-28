@@ -52,12 +52,16 @@ async function playedWith(id1, id2, matches) {
 
     // add as partidas em q id2 aparece
     for (let j = 0; j < participantIdentities.length; j++) {
-      // add nick 1 to match json
-      if (participantIdentities[j].player.accountId === id1) {
-        matches[i].nick1 = participantIdentities[j].player.summonerName;
+      if (participantIdentities[j].player.currentAccountId === id1) {
+        matches[i].nick1 = participantIdentities[j].player.summonerName; // add nick1 to mach json
+        const participant1Id = participantIdentities[j].participantId;
+        const player1KDA = playerKDAByParticipantId(
+          data.participants[participant1Id - 1]
+        );
+        matches[i].player1KDA = player1KDA;
       }
 
-      if (participantIdentities[j].player.accountId === id2) {
+      if (participantIdentities[j].player.currentAccountId === id2) {
         matches[i].nick2 = participantIdentities[j].player.summonerName; // add nick 2 to match json
         console.log(
           "////////////////////////match found!////////////////////////"
@@ -65,10 +69,14 @@ async function playedWith(id1, id2, matches) {
         const championName1 = await getChampionNameByKey(matches[i].champion);
         const championIcon1 = getChampionIconLinkByName(championName1);
         const participant2Id = participantIdentities[j].participantId;
+        const player2KDA = playerKDAByParticipantId(
+          data.participants[participant2Id - 1]
+        );
         const championKey2 = data.participants[participant2Id - 1].championId;
         const championName2 = await getChampionNameByKey(championKey2);
         const championIcon2 = getChampionIconLinkByName(championName2);
 
+        matches[i].player2KDA = player2KDA;
         matches[i].description = await convertQueueToString(matches[i].queue);
         matches[i].date = convertTimestampToDate(matches[i].timestamp);
         matches[i].icon1 = championIcon1;
@@ -121,6 +129,14 @@ async function convertQueueToString(queue) {
       return queueList[i].description;
     }
   }
+}
+
+function playerKDAByParticipantId(participantData) {
+  const kills = participantData.stats.kills;
+  const deaths = participantData.stats.deaths;
+  const assists = participantData.stats.assists;
+  const kda = kills + "/" + deaths + "/" + assists;
+  return kda;
 }
 
 module.exports = router;
