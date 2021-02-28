@@ -24,16 +24,6 @@ router.get("/:nick1/:nick2/:min/:max", async (req, res, next) => {
   }
 });
 
-async function getChampionNameByKey(championKey) {
-  const champions = require("../assets/champions.json");
-  return champions[championKey];
-}
-
-function getChampionIconLinkByName(name) {
-  const urlIcon = `http://ddragon.leagueoflegends.com/cdn/11.4.1/img/champion/${name}.png`;
-  return urlIcon;
-}
-
 async function playedWith(id1, id2, matches) {
   let urlMatch = "";
   const foundMatches = [];
@@ -50,25 +40,31 @@ async function playedWith(id1, id2, matches) {
     // pega a lista dos jogadores da partida
     const participantIdentities = data.participantIdentities;
 
-    // add as partidas em q id2 aparece
+    // procura pelas partidas em que id2 aparece
     for (let j = 0; j < participantIdentities.length; j++) {
       if (participantIdentities[j].player.currentAccountId === id1) {
-        matches[i].nick1 = participantIdentities[j].player.summonerName; // add nick1 to mach json
+        const nick1 = participantIdentities[j].player.summonerName;
         const participant1Id = participantIdentities[j].participantId;
         const player1KDA = playerKDAByParticipantId(
           data.participants[participant1Id - 1]
         );
+
+        matches[i].nick1 = nick1;
         matches[i].player1KDA = player1KDA;
       }
 
+      // achou id2, e add o resto das informações
       if (participantIdentities[j].player.currentAccountId === id2) {
-        matches[i].nick2 = participantIdentities[j].player.summonerName; // add nick 2 to match json
         console.log(
           "////////////////////////match found!////////////////////////"
         );
+        const description = await convertQueueToString(matches[i].queue);
+        const date = convertTimestampToDate(matches[i].timestamp);
         const championName1 = await getChampionNameByKey(matches[i].champion);
         const championIcon1 = getChampionIconLinkByName(championName1);
+
         const participant2Id = participantIdentities[j].participantId;
+        const nick2 = participantIdentities[j].player.summonerName;
         const player2KDA = playerKDAByParticipantId(
           data.participants[participant2Id - 1]
         );
@@ -76,14 +72,16 @@ async function playedWith(id1, id2, matches) {
         const championName2 = await getChampionNameByKey(championKey2);
         const championIcon2 = getChampionIconLinkByName(championName2);
 
+        matches[i].description = description;
+        matches[i].date = date;
+        matches[i].nick2 = nick2;
         matches[i].player2KDA = player2KDA;
-        matches[i].description = await convertQueueToString(matches[i].queue);
-        matches[i].date = convertTimestampToDate(matches[i].timestamp);
         matches[i].icon1 = championIcon1;
         matches[i].icon2 = championIcon2;
         matches[
           i
         ].link = `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}`;
+
         foundMatches.push(matches[i]);
       }
     }
@@ -111,6 +109,16 @@ async function getPlayersId(nick1, nick2) {
   console.log(ids);
   console.log("----------------------------------------------------");
   return ids;
+}
+
+async function getChampionNameByKey(championKey) {
+  const champions = require("../assets/champions.json");
+  return champions[championKey];
+}
+
+function getChampionIconLinkByName(name) {
+  const urlIcon = `http://ddragon.leagueoflegends.com/cdn/11.4.1/img/champion/${name}.png`;
+  return urlIcon;
 }
 
 function convertTimestampToDate(timestamp) {
