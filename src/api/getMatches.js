@@ -27,9 +27,12 @@ router.get("/:nick1/:nick2/:min/:max", async (req, res, next) => {
 async function playedWith(id1, id2, matches) {
   const foundMatches = [];
 
+  const dataList = [];
+  await getMatchesInParallel(matches, dataList);
+  await getDetailedCommonMatches(matches, dataList, id1, id2, foundMatches);
 
-    // get partida pelo id
-    const { data } = await axios.get(urlMatch);
+  return foundMatches;
+}
 
 async function getDetailedCommonMatches(
   matches,
