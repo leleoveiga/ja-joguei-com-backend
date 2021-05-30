@@ -94,7 +94,29 @@ async function getDetailedCommonMatches(
   }
 }
 
-  return foundMatches;
+async function getMatchesInParallel(matches, dataList) {
+  const promises = [];
+
+  for (let i = 0; i < matches.length; i++) {
+    const delay = 60 * i;
+    // eslint-disable-next-line no-async-promise-executor
+    const promise = new Promise(async function (resolve) {
+      // eslint-disable-next-line promise/param-names
+      await new Promise((res) => setTimeout(res, delay));
+      console.log(`promise ${i}`);
+      const url = `https://br1.api.riotgames.com/lol/match/v4/matches/${matches[i].gameId}?api_key=${process.env.API_KEY}`;
+      const result = await axios.get(url);
+      resolve(result);
+    });
+
+    promises.push(promise);
+  }
+  await Promise.all(promises).then(async function (results) {
+    results.forEach(function (response) {
+      const { data } = response;
+      dataList.push(data);
+    });
+  });
 }
 
 async function getPlayersId(nick1, nick2) {
