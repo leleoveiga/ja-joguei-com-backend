@@ -31,18 +31,27 @@ async function playedWith(id1, id2, matches) {
     // get partida pelo id
     const { data } = await axios.get(urlMatch);
 
+async function getDetailedCommonMatches(
+  matches,
+  dataList,
+  id1,
+  id2,
+  foundMatches
+) {
+  for (let i = 0; i < matches.length; i++) {
+    const data = dataList[i];
     // pega a lista dos jogadores da partida
     const participantIdentities = data.participantIdentities;
 
-    // procura pelas partidas em que id2 aparece
     for (let j = 0; j < participantIdentities.length; j++) {
+      // procura e add informações do jogador 1
       if (participantIdentities[j].player.currentAccountId === id1) {
         const nick1 = participantIdentities[j].player.summonerName;
         const participant1Id = participantIdentities[j].participantId;
         const player1KDA = playerKDAByParticipantId(
           data.participants[participant1Id - 1]
         );
-
+        matches[i].urlparticipant = j + 1;
         matches[i].nick1 = nick1;
         matches[i].player1KDA = player1KDA;
       }
@@ -50,9 +59,9 @@ async function playedWith(id1, id2, matches) {
       // achou id2, e add o resto das informações
       if (participantIdentities[j].player.currentAccountId === id2) {
         console.log(
-          "////////////////////////match found!////////////////////////"
+          `////////////////////////match ${i} is common!////////////////////////`
         );
-        const description = await convertQueueToString(matches[i].queue);
+        const queueMode = await convertQueueToString(matches[i].queue);
         const date = convertTimestampToDate(matches[i].timestamp);
         const championName1 = await getChampionNameByKey(matches[i].champion);
         const championIcon1 = getChampionIconLinkByName(championName1);
@@ -66,7 +75,7 @@ async function playedWith(id1, id2, matches) {
         const championName2 = await getChampionNameByKey(championKey2);
         const championIcon2 = getChampionIconLinkByName(championName2);
 
-        matches[i].description = description;
+        matches[i].description = queueMode;
         matches[i].date = date;
         matches[i].nick2 = nick2;
         matches[i].player2KDA = player2KDA;
@@ -83,6 +92,7 @@ async function playedWith(id1, id2, matches) {
       `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}`
     );
   }
+}
 
   return foundMatches;
 }
