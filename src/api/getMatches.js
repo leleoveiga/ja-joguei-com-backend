@@ -25,14 +25,8 @@ router.get("/:nick1/:nick2/:min/:max", async (req, res, next) => {
 });
 
 async function playedWith(id1, id2, matches) {
-  let urlMatch = "";
   const foundMatches = [];
 
-  for (let i = 0; i < matches.length; i++) {
-    console.log(
-      `---------------------match: ${i + 1}--------------------------`
-    );
-    urlMatch = `https://br1.api.riotgames.com/lol/match/v4/matches/${matches[i].gameId}?api_key=${process.env.API_KEY}`;
 
     // get partida pelo id
     const { data } = await axios.get(urlMatch);
