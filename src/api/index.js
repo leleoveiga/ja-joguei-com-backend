@@ -1,5 +1,5 @@
 const express = require("express");
-const getMatches = require("./getMatches");
+const detailedMatches = require("./getDetailedMatches");
 
 const router = express.Router();
 
@@ -9,6 +9,6 @@ router.get("/", (req, res) => {
   });
 });
 
-router.use("/getMatches", getMatches);
+router.use("/getMatches", detailedMatches);
 
 module.exports = router;
