@@ -92,7 +92,7 @@ async function getDetailedCommonMatches(
       }
     }
     console.log(
-      `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}`
+      `match ${i} https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}#participant${matches[i].urlparticipant}`
     );
   }
 }
