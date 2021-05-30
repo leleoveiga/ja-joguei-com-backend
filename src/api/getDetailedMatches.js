@@ -86,7 +86,7 @@ async function getDetailedCommonMatches(
         matches[i].icon2 = championIcon2;
         matches[
           i
-        ].link = `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}`;
+        ].link = `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}#participant${matches[i].urlparticipant}`;
 
         foundMatches.push(matches[i]);
       }
