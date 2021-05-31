@@ -7,6 +7,9 @@ const helmet = require("helmet");
 const middlewares = require("./middlewares");
 const api = require("./api");
 
+const fs = require("fs");
+const riotTXT = fs.readFileSync(path.join(__dirname, "/riot.txt"));
+
 const app = express();
 
 app.use(
@@ -18,6 +21,9 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
+app.use("/riot.txt", (req, res) => {
+  res.send(riotTXT);
+});
 app.use("/api/", api);
 // production
 if (process.env.NODE_ENV === "production") {
