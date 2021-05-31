@@ -24,6 +24,10 @@ app.use(express.json());
 app.use("/riot.txt", (req, res) => {
   res.send(riotTXT);
 });
+app.use("//riot.txt", (req, res) => {
+  res.send(riotTXT);
+});
+
 app.use("/api/", api);
 // production
 if (process.env.NODE_ENV === "production") {
