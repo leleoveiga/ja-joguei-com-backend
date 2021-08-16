@@ -5,13 +5,15 @@ function notFound(req, res, next) {
 }
 
 function errorHandler(err, req, res, next) {
-  const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
-  res.status(statusCode);
-  console.log(`Error captured by middleware: ${err.message}`);
-  res.json({
-    message: err.message,
-    stack: process.env.NODE_ENV === "production" ? "🥞" : err.stack,
-  });
+  // const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+  console.log(err.response);
+  // res.status(err.response.status);
+  // console.log(`Error captured by middleware: ${err.message}`);
+  // console.log(`Error captured by middleware: ${err.response.statusText}`);
+  // res.json({
+  //   message: err.message,
+  //   stack: process.env.NODE_ENV === "production" ? "🥞" : err.stack,
+  // });
 }
 
 module.exports = {

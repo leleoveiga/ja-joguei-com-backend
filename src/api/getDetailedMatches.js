@@ -102,7 +102,7 @@ async function getMatchesInParallel(matches, dataList) {
   const promises = [];
   console.log("////////////////////////////////matches: \n", matches);
   for (let i = 0; i < matches.length; i++) {
-    const delay = 200 * i;
+    const delay = 60 * i;
     // eslint-disable-next-line no-async-promise-executor
     const promise = new Promise(async function (resolve) {
       // eslint-disable-next-line promise/param-names
@@ -110,8 +110,12 @@ async function getMatchesInParallel(matches, dataList) {
       const url = `https://americas.api.riotgames.com/lol/match/v5/matches/${matches[i]}?api_key=${process.env.API_KEY}`;
       console.log(url);
       console.log(`//////////////////////promise ${i}`);
+      // try {
       const match = await axios.get(url);
       resolve(match);
+      // } catch (error) {
+      //   console.log(error.response.status);
+      // }
     });
     // info.participants[i].puuid
     promises.push(promise);
