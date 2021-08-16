@@ -53,7 +53,7 @@ async function getDetailedCommonMatches(
       if (participantIdentities[j].puuid === id1) {
         const nick1 = participantIdentities[j].summonerName;
         const player1KDA = playerKDAByParticipantId(data.participants[j]);
-        dataList[i].urlparticipant = j + 1;
+        dataList[i].urlparticipant = j;
         dataList[i].nick1 = nick1;
         dataList[i].player1KDA = player1KDA;
         dataList[i].player1KDA = player1KDA;
@@ -70,7 +70,7 @@ async function getDetailedCommonMatches(
           `////////////////////////match ${i} is common!////////////////////////`
         );
         const queueMode = await convertQueueToString(dataList[i].queue);
-        const date = convertTimestampToDate(dataList[i].timestamp);
+        const date = convertTimestampToDate(dataList[i].gameStartTimestamp);
 
         // const participant2Id = participantIdentities[j].participantId;
         const nick2 = participantIdentities[j].summonerName;

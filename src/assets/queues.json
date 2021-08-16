@@ -271,6 +271,12 @@
     "notes": null
   },
   {
+    "queueId": 1400,
+    "map": "Summoner's Rift",
+    "description": "Ultimate Spellbook",
+    "notes": null
+  },
+  {
     "queueId": 2000,
     "map": "Summoner's Rift",
     "description": "Tutorial 1",
