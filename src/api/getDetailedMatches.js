@@ -3,20 +3,20 @@ const axios = require("axios");
 
 const router = express.Router();
 
-router.get("/:nick1/:nick2/:min/:max", async (req, res, next) => {
+router.get("/:nick1/:nick2/:min/:count", async (req, res, next) => {
   try {
     const ids = await getPlayersId(req.params.nick1, req.params.nick2);
     const min = req.params.min;
-    const max = req.params.max;
+    const count = req.params.count;
 
     // link api
-    const urlTarget = `https://br1.api.riotgames.com/lol/match/v4/matchlists/by-account/${ids[0]}?api_key=${process.env.API_KEY}&beginIndex=${min}&endIndex=${max}`;
+    const matchHistoryUrl = `https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${ids[0]}/ids?start=${min}&count=${count}&api_key=${process.env.API_KEY}`;
 
     // pega a lista de partidas do player
-    const { data } = await axios.get(urlTarget);
-
+    //  const { data } = await axios.get(matchHistoryUrl);
+    const { data } = await axios.get(matchHistoryUrl);
     // filtra com o segundo id
-    const foundMatches = await playedWith(ids[0], ids[1], data.matches);
+    const foundMatches = await playedWith(ids[0], ids[1], data);
 
     res.json(foundMatches);
   } catch (error) {
@@ -41,83 +41,85 @@ async function getDetailedCommonMatches(
   id2,
   foundMatches
 ) {
-  for (let i = 0; i < matches.length; i++) {
+  console.log("🚀 ~ file: getDetailedMatches.js ~ line 44 ~ matches", dataList);
+
+  for (let i = 0; i < dataList.length; i++) {
     const data = dataList[i];
     // pega a lista dos jogadores da partida
-    const participantIdentities = data.participantIdentities;
+    const participantIdentities = data.participants;
 
     for (let j = 0; j < participantIdentities.length; j++) {
       // procura e add informações do jogador 1
-      if (participantIdentities[j].player.currentAccountId === id1) {
-        const nick1 = participantIdentities[j].player.summonerName;
-        const participant1Id = participantIdentities[j].participantId;
-        const player1KDA = playerKDAByParticipantId(
-          data.participants[participant1Id - 1]
+      if (participantIdentities[j].puuid === id1) {
+        const nick1 = participantIdentities[j].summonerName;
+        const player1KDA = playerKDAByParticipantId(data.participants[j]);
+        dataList[i].urlparticipant = j + 1;
+        dataList[i].nick1 = nick1;
+        dataList[i].player1KDA = player1KDA;
+        dataList[i].player1KDA = player1KDA;
+        const championName1 = await getChampionNameByKey(
+          dataList[i].participants[j].championId
         );
-        matches[i].urlparticipant = j + 1;
-        matches[i].nick1 = nick1;
-        matches[i].player1KDA = player1KDA;
+        const championIcon1 = getChampionIconLinkByName(championName1);
+        dataList[i].icon1 = championIcon1;
       }
 
       // achou id2, e add o resto das informações
-      if (participantIdentities[j].player.currentAccountId === id2) {
+      if (participantIdentities[j].puuid === id2) {
         console.log(
           `////////////////////////match ${i} is common!////////////////////////`
         );
-        const queueMode = await convertQueueToString(matches[i].queue);
-        const date = convertTimestampToDate(matches[i].timestamp);
-        const championName1 = await getChampionNameByKey(matches[i].champion);
-        const championIcon1 = getChampionIconLinkByName(championName1);
+        const queueMode = await convertQueueToString(dataList[i].queue);
+        const date = convertTimestampToDate(dataList[i].timestamp);
 
-        const participant2Id = participantIdentities[j].participantId;
-        const nick2 = participantIdentities[j].player.summonerName;
-        const player2KDA = playerKDAByParticipantId(
-          data.participants[participant2Id - 1]
-        );
-        const championKey2 = data.participants[participant2Id - 1].championId;
+        // const participant2Id = participantIdentities[j].participantId;
+        const nick2 = participantIdentities[j].summonerName;
+
+        const player2KDA = playerKDAByParticipantId(data.participants[j]);
+        const championKey2 = data.participants[j].championId;
+        // const championKey2 = data.participants[participant2Id - 1].championId;
         const championName2 = await getChampionNameByKey(championKey2);
         const championIcon2 = getChampionIconLinkByName(championName2);
 
-        matches[i].description = queueMode;
-        matches[i].date = date;
-        matches[i].nick2 = nick2;
-        matches[i].player2KDA = player2KDA;
-        matches[i].icon1 = championIcon1;
-        matches[i].icon2 = championIcon2;
-        matches[
+        dataList[i].description = queueMode;
+        dataList[i].date = date;
+        dataList[i].nick2 = nick2;
+        dataList[i].player2KDA = player2KDA;
+        dataList[i].icon2 = championIcon2;
+        dataList[
           i
-        ].link = `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}#participant${matches[i].urlparticipant}`;
-
-        foundMatches.push(matches[i]);
+        ].link = `https://www.leagueofgraphs.com/pt/match/br/${dataList[i].gameId}#participant${dataList[i].urlparticipant}`;
+        foundMatches.push(dataList[i]);
       }
     }
     console.log(
-      `match ${i} https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}#participant${matches[i].urlparticipant}`
+      `match ${i} https://www.leagueofgraphs.com/pt/match/br/${dataList[i].gameId}#participant${dataList[i].urlparticipant}`
     );
   }
 }
 
 async function getMatchesInParallel(matches, dataList) {
   const promises = [];
-
+  console.log("////////////////////////////////matches: \n", matches);
   for (let i = 0; i < matches.length; i++) {
-    const delay = 60 * i;
+    const delay = 200 * i;
     // eslint-disable-next-line no-async-promise-executor
     const promise = new Promise(async function (resolve) {
       // eslint-disable-next-line promise/param-names
       await new Promise((res) => setTimeout(res, delay));
-      console.log(`promise ${i}`);
-      const url = `https://br1.api.riotgames.com/lol/match/v4/matches/${matches[i].gameId}?api_key=${process.env.API_KEY}`;
-      const result = await axios.get(url);
-      resolve(result);
+      const url = `https://americas.api.riotgames.com/lol/match/v5/matches/${matches[i]}?api_key=${process.env.API_KEY}`;
+      console.log(url);
+      console.log(`//////////////////////promise ${i}`);
+      const match = await axios.get(url);
+      resolve(match);
     });
-
+    // info.participants[i].puuid
     promises.push(promise);
   }
-  await Promise.all(promises).then(async function (results) {
+  await Promise.all(promises).then(function (results) {
     results.forEach(function (response) {
       const { data } = response;
-      dataList.push(data);
+      dataList.push(data.info);
     });
   });
 }
@@ -127,11 +129,10 @@ async function getPlayersId(nick1, nick2) {
   const ids = [];
 
   let urlTarget = "";
-
   for (let i = 0; i < 2; i++) {
     urlTarget = `https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${nicks[i]}?api_key=${process.env.API_KEY}`;
     const { data } = await axios.get(urlTarget);
-    ids.push(data.accountId);
+    ids.push(data.puuid);
   }
 
   console.log("--------------------selected ids--------------------");
@@ -169,9 +170,9 @@ async function convertQueueToString(queue) {
 }
 
 function playerKDAByParticipantId(participantData) {
-  const kills = participantData.stats.kills;
-  const deaths = participantData.stats.deaths;
-  const assists = participantData.stats.assists;
+  const kills = participantData.kills;
+  const deaths = participantData.deaths;
+  const assists = participantData.assists;
   const kda = kills + "/" + deaths + "/" + assists;
   return kda;
 }
