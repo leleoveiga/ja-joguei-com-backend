@@ -94,7 +94,7 @@ async function getMatches(matches, dataList) {
       const url = `https://americas.api.riotgames.com/lol/match/v5/matches/${matches[i]}?api_key=${process.env.API_KEY}`;
       console.log(url);
       console.log(`//////////////////////promise ${i}`);
-      const match = await axios.get(url);
+      const match = axios.get(url);
       resolve(match);
     });
     promises.push(getMatchPromise);
