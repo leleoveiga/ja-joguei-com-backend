@@ -9,7 +9,7 @@ const api = require("./api");
 
 const fs = require("fs");
 const riotTXT = fs.readFileSync(path.join(__dirname, "/riot.txt"));
-
+// TODO: dinamicamente pegar champs e filas
 const app = express();
 
 app.use(

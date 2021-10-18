@@ -112,7 +112,8 @@ async function getPlayersId(nick1, nick2) {
   const ids = [];
 
   for (let i = 0; i < 2; i++) {
-    const summonerUrl = `https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${nicks[i]}?api_key=${process.env.API_KEY}`;
+    const nick = encodeURI(nicks[i]);
+    const summonerUrl = `https://br1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${nick}?api_key=${process.env.API_KEY}`;
     const { data } = await axios.get(summonerUrl);
     ids.push(data.puuid);
   }
