@@ -5,15 +5,15 @@ function notFound(req, res, next) {
 }
 
 function errorHandler(err, req, res, next) {
-  //   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
-  console.log(err.response);
-  console.log(err.response.data);
-  res.status(err.response.data.status.status_code ?? err.statusCode);
-  //   res.json({
-  //     message: err.message,
-  //     stack: process.env.NODE_ENV === "production" ? "🥞" : err.stack,
-  //   });
-  res.json(err.response.data);
+  // const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+  const statusMessage = err.response?.statusText ?? "Erro inesperado!";
+  const status = err.response?.status ?? 500;
+  res.statusMessage = statusMessage;
+  res.status(status);
+  res.json({
+    message: err.message,
+    stack: process.env.NODE_ENV === "production" ? "🥞" : err.stack,
+  });
 }
 
 module.exports = {
