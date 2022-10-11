@@ -29,57 +29,84 @@ async function playedWith(id1, id2, matchesIDs) {
 
   await getMatches(matchesIDs, matches);
   await getDetailedCommonMatches(matches, id1, id2, commonMatches);
+  console.log(
+    "🚀 ~ file: getDetailedMatches.js ~ line 32 ~ playedWith ~ commonMatches",
+    commonMatches
+  );
 
   return commonMatches;
 }
 
-async function getDetailedCommonMatches(matches, id1, id2, commonMatches) {
-  for (let i = 0; i < matches.length; i++) {
-    // pega a lista dos jogadores da partida
-    const players = matches[i].participants;
-
-    for (let j = 0; j < players.length; j++) {
-      const player = players[j];
-      // procura e add informações do jogador 1
+function findCommonMatches(matches, id1, id2, commomMatchesList) {
+  matches.forEach((match) => {
+    const rawMatchData = {
+      matchData: {},
+      player1Data: {},
+      player2Data: {},
+    };
+    match.participants.forEach((player, index) => {
       if (player.puuid === id1) {
-        const nick1 = player.summonerName;
-        const player1KDA = getPlayerKDA(player);
-        const championName1 = await getChampionNameByKey(player.championId);
-        const championIcon1 = getChampionIconLinkByName(championName1);
-
-        matches[ // não está funcionando
-          i
-        ].link = `https://www.leagueofgraphs.com/pt/match/br/${matches[i].gameId}#participant${j}`;
-        matches[i].nick1 = nick1;
-        matches[i].player1KDA = player1KDA;
-        matches[i].icon1 = championIcon1;
+        rawMatchData.player1Data = player;
+        rawMatchData.player1Data.index = index + 1;
+      } else if (player.puuid === id2) {
+        rawMatchData.player2Data = player;
+        rawMatchData.matchData = match;
+        commomMatchesList.push(rawMatchData);
       }
+    });
+  });
+}
 
-      // achou id2, e add o resto das informações
-      if (player.puuid === id2) {
-        console.log(
-          `////////////////////////match ${i} is common!////////////////////////`
-        );
-        const queueMode = await convertQueueToString(matches[i].queueId);
-        const date = convertTimestampToDate(matches[i].gameStartTimestamp);
+async function getDetailedCommonMatches(matches, id1, id2, commonMatches) {
+  const commomMatchesList = [];
 
-        matches[i].description = queueMode;
-        matches[i].date = date;
+  findCommonMatches(matches, id1, id2, commomMatchesList);
 
-        const nick2 = player.summonerName;
-        const player2KDA = getPlayerKDA(player);
-        const championKey2 = player.championId;
-        const championName2 = await getChampionNameByKey(championKey2);
-        const championIcon2 = getChampionIconLinkByName(championName2);
+  const formattedCommonMatchList = commomMatchesList.map(
+    async (rawMatchData, i) => {
+      console.log(
+        `//////////////////////// appending match ${i} ////////////////////////`
+      );
+      const queueMode = await convertQueueToString(
+        rawMatchData.matchData.queueId
+      );
+      const date = convertTimestampToDate(
+        rawMatchData.matchData.gameStartTimestamp
+      );
+      const matchData = {
+        gameId: rawMatchData.matchData.gameId,
+        description: queueMode,
+        date: date,
+      };
 
-        matches[i].nick2 = nick2;
-        matches[i].player2KDA = player2KDA;
-        matches[i].icon2 = championIcon2;
-        commonMatches.push(matches[i]);
-      }
+      // add player 1 data
+      const nick1 = rawMatchData.player1Data.summonerName;
+      const player1KDA = getPlayerKDA(rawMatchData.player1Data);
+      const championName1 = rawMatchData.player1Data.championName;
+      const championIcon1 = getChampionIconLinkByName(championName1);
+      matchData.link = `https://www.leagueofgraphs.com/pt/match/br/${matchData.gameId}#participant${rawMatchData.player1Data.index}`;
+      matchData.nick1 = nick1;
+      matchData.player1KDA = player1KDA;
+      matchData.icon1 = championIcon1;
+      matchData.player1Win = rawMatchData.player1Data.win;
+
+      // add player 2 data
+      const nick2 = rawMatchData.player2Data.summonerName;
+      const player2KDA = getPlayerKDA(rawMatchData.player2Data);
+      const championName2 = rawMatchData.player2Data.championName;
+      const championIcon2 = getChampionIconLinkByName(championName2);
+      matchData.nick2 = nick2;
+      matchData.player2KDA = player2KDA;
+      matchData.icon2 = championIcon2;
+      matchData.player2Win = rawMatchData.player2Data.win;
+      commonMatches.push(matchData);
+
+      console.log(`match ${i} ${matchData.link}`);
     }
-    console.log(`match ${i} ${matches[i].link}`);
-  }
+  );
+  const result = await Promise.all(formattedCommonMatchList);
+
+  commonMatches = result;
 }
 
 async function getMatches(matches, dataList) {
@@ -124,11 +151,6 @@ async function getPlayersId(nick1, nick2) {
   return ids;
 }
 
-async function getChampionNameByKey(championKey) {
-  const champions = require("../assets/champions.json");
-  return champions[championKey];
-}
-
 function getChampionIconLinkByName(name) {
   const urlIcon = `http://ddragon.leagueoflegends.com/cdn/11.4.1/img/champion/${name}.png`;
   return urlIcon;
@@ -145,11 +167,8 @@ function convertTimestampToDate(timestamp) {
 
 async function convertQueueToString(queue) {
   const queueList = require("../assets/queues.json");
-  for (let i = 0; i < queueList.length; i++) {
-    if (queueList[i].queueId === queue) {
-      return queueList[i].description;
-    }
-  }
+  const queueMode = queueList.find((queueMode) => queueMode.queueId === queue);
+  return queueMode.description ?? "Custom games";
 }
 
 function getPlayerKDA(playerData) {
