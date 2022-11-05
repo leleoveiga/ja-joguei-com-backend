@@ -152,7 +152,7 @@ async function getPlayersId(nick1, nick2) {
 }
 
 function getChampionIconLinkByName(name) {
-  const urlIcon = `http://ddragon.leagueoflegends.com/cdn/11.4.1/img/champion/${name}.png`;
+  const urlIcon = `http://ddragon.leagueoflegends.com/cdn/12.21.1/img/champion/${name}.png`;
   return urlIcon;
 }
 
